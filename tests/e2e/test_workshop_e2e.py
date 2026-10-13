@@ -24,6 +24,10 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     # 2. 点击编辑链接
     page.get_by_role("link", name="Edit car").click()
 
+    # 等待编辑表单从服务器加载完成（避免异步填充覆盖后续输入）
+    expect(page.get_by_label("Model", exact=True)).to_have_value("Civic")
+    expect(page.get_by_label("Year", exact=True)).to_have_value("2022")
+
     # 3. 修改型号和年份
     page.get_by_label("Model", exact=True).fill("Accord")
     page.get_by_label("Year", exact=True).fill("2023")
