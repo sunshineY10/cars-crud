@@ -1,3 +1,7 @@
+from playwright.sync_api import expect
+
+# 全局设置断言超时，适配 CI 慢环境
+expect.set_default_timeout(15000)
 """A real server and a fresh browser context for every E2E test."""
 
 import os
