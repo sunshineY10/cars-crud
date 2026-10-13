@@ -1,8 +1,7 @@
-from playwright.sync_api import expect
 
-# 全局设置断言超时，适配 CI 慢环境
-expect.set_default_timeout(15000)
-"""A real server and a fresh browser context for every E2E test."""
+
+# 全局设置断言超时为15秒，适配CI慢环境
+
 
 import os
 import socket
@@ -19,7 +18,11 @@ from app.main import create_app
 
 def pytest_addoption(parser):
     parser.addoption("--headed", action="store_true", help="Show the E2E browser window")
-
+@pytest.fixture
+def page(page):
+    # 全局设置页面操作、断言超时为15秒，适配CI慢环境
+    page.set_default_timeout(15000)
+    return page
 
 @pytest.fixture
 def live_server(tmp_path: Path) -> Iterator[str]:
