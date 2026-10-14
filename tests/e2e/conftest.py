@@ -1,3 +1,5 @@
+"""A real server and a fresh browser context for every E2E test."""
+
 import os
 import socket
 import threading
@@ -7,12 +9,8 @@ from pathlib import Path
 
 import pytest
 import uvicorn
-from playwright.sync_api import expect
 
 from app.main import create_app
-
-# Give expect() assertions (e.g. to_be_visible) enough time on slow CI runners.
-expect.set_options(timeout=15000)
 
 
 def pytest_addoption(parser):
@@ -55,7 +53,7 @@ def browser(pytestconfig):
     from playwright.sync_api import sync_playwright
 
     with sync_playwright() as playwright:
-        options = {"headless": True}
+        options = {"headless": not pytestconfig.getoption("--headed")}
         executable = os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH")
         if executable:
             options["executable_path"] = executable
@@ -71,8 +69,6 @@ def page(browser):
     # No cookies, local storage, or browser state is shared between tests.
     context = browser.new_context()
     page = context.new_page()
-    # Give slower CI runners enough time for page operations.
-    page.set_default_timeout(15000)
     try:
         yield page
     finally:
